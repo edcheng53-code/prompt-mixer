@@ -16,12 +16,15 @@
       --surface-muted: #f0ede5;
       --text-main: #403b36;
       --text-soft: #6f675f;
-      --accent: #f97316;
+      --accent: #F26622;
       --shadow-soft: 0 8px 26px rgba(99, 88, 77, 0.08);
       --shadow-tiny: 0 3px 10px rgba(99, 88, 77, 0.06);
     }
 
-    body { background: var(--bg); }
+    body {
+      background: var(--bg);
+      font-family: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif;
+    }
     .snap-x-mandatory { scroll-snap-type: x mandatory; }
     .snap-start { scroll-snap-align: start; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -42,8 +45,8 @@
 </head>
 <body class="min-h-screen overflow-hidden text-[var(--text-main)] antialiased">
   <div class="h-screen flex flex-col">
-    <header class="safe-pt px-5 pt-4 pb-4 z-20">
-      <div class="soft-card rounded-[2rem] px-4 py-4">
+    <header class="safe-pt px-4 pt-3 pb-2 z-20">
+      <div class="soft-card rounded-[2rem] px-3 py-3">
         <div class="flex items-center gap-3">
           <div id="scenarioTabs" class="flex-1 overflow-x-auto hide-scrollbar">
             <div class="flex gap-3 min-w-max"></div>
@@ -54,16 +57,16 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-hidden px-5 pb-4">
-      <div class="soft-card h-full rounded-[2rem] p-2 overflow-hidden">
+    <main class="flex-1 overflow-hidden px-4 pb-2">
+      <div class="soft-card h-full rounded-[2rem] p-1.5 overflow-hidden">
         <div id="carousel" class="h-full flex overflow-x-auto snap-x-mandatory hide-scrollbar"></div>
       </div>
     </main>
 
-    <footer class="safe-pb px-5 pb-5 pt-1 shrink-0">
-      <div class="soft-card rounded-[2rem] px-4 py-4 max-w-5xl mx-auto">
-        <div class="mb-3 max-w-4xl mx-auto">
-          <label class="text-xs text-[var(--text-soft)] mb-2 block">語音 / 文字輸入</label>
+    <footer class="safe-pb px-4 pb-3 pt-1 shrink-0">
+      <div class="soft-card rounded-[2rem] px-3 py-3 max-w-5xl mx-auto">
+        <div class="mb-2 max-w-4xl mx-auto">
+          <label class="text-xs text-[var(--text-soft)] mb-1 block">語音 / 文字輸入</label>
           <textarea id="inputText" rows="2" placeholder="輸入你要追加的內容..."
             class="w-full resize-none overflow-hidden rounded-full bg-[var(--surface-muted)] px-5 py-3 text-sm text-[var(--text-main)] placeholder:text-[#9a9188] focus:outline-none focus:ring-2 focus:ring-[#f97316]/45"></textarea>
         </div>
@@ -79,7 +82,7 @@
           </button>
 
           <div class="relative ml-auto">
-            <button id="menuBtn" class="h-14 px-6 rounded-full bg-[var(--surface-muted)] hover:bg-[#ebe7de] flex items-center justify-center soft-pill">💾</button>
+            <button id="menuBtn" class="h-14 px-6 rounded-full bg-[var(--surface-muted)] hover:bg-[#ebe7de] transition font-semibold text-[var(--text-main)] flex items-center justify-center gap-2 soft-pill">💾 存檔</button>
             <div id="menuPanel" class="hidden absolute right-0 bottom-20 w-48 rounded-[1.5rem] bg-[var(--surface)] shadow-[0_14px_28px_rgba(87,74,61,0.12)] overflow-hidden p-1">
               <button id="exportBtn" class="w-full text-left px-4 py-3 hover:bg-[var(--surface-muted)] text-sm rounded-full">匯出 JSON</button>
               <button id="importBtn" class="w-full text-left px-4 py-3 hover:bg-[var(--surface-muted)] text-sm rounded-full">匯入 JSON</button>
@@ -88,7 +91,7 @@
           </div>
         </div>
 
-        <p id="status" class="text-xs text-[var(--text-soft)] mt-3 h-4 text-center"></p>
+        <p id="status" class="text-xs text-[var(--text-soft)] mt-2 h-4 text-center"></p>
       </div>
     </footer>
   </div>
@@ -169,7 +172,7 @@
       mixerData.scenarios.forEach(sc => {
         const active = sc.id === mixerData.activeScenarioId;
         const btn = document.createElement("button");
-        btn.className = `h-12 px-5 rounded-full text-sm whitespace-nowrap transition ${active ? "bg-[#fff2e8] text-[#a34b00] ring-2 ring-[#f97316] shadow-[0_6px_16px_rgba(249,115,22,0.18)]" : "bg-[var(--surface-muted)] text-[var(--text-main)] hover:bg-[#ebe7de] soft-pill"}`;
+        btn.className = `h-10 px-4 rounded-full text-sm whitespace-nowrap transition ${active ? "bg-[#fff2e8] text-[#a34b00] ring-2 ring-[var(--accent)] shadow-[0_6px_16px_rgba(242,102,34,0.18)]" : "bg-[var(--surface-muted)] text-[var(--text-main)] hover:bg-[#ebe7de] soft-pill"}`;
         btn.textContent = sc.name;
         btn.onclick = () => { mixerData.activeScenarioId = sc.id; saveData(); renderAll(); };
         attachLongPress(btn, () => {
@@ -199,13 +202,13 @@
       carousel.innerHTML = "";
       sc.panels.forEach((panel, pIdx) => {
         const section = document.createElement("section");
-        section.className = "snap-start min-w-full h-full p-5 flex flex-col";
+        section.className = "snap-start min-w-full h-full p-3 flex flex-col";
         section.innerHTML = `
-          <div class="mb-5 flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-[var(--text-main)]">${panel.title}</h2>
-            <button class="add-block h-11 px-5 rounded-full bg-[var(--surface-muted)] hover:bg-[#e9e4da] text-sm soft-pill">+ 新增積木</button>
+          <div class="mb-2 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-[var(--text-main)]">${panel.title}</h2>
+            <button class="add-block h-9 px-4 rounded-full bg-[var(--surface-muted)] hover:bg-[#e9e4da] text-sm soft-pill">+ 新增積木</button>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto pb-3 flex-1"></div>
+          <div class="grid grid-cols-3 gap-2 md:gap-3 overflow-y-auto pb-2 flex-1"></div>
         `;
 
         section.querySelector(".add-block").onclick = () => {
@@ -219,7 +222,7 @@
         panel.blocks.forEach(block => {
           const isSel = selected.has(block.id);
           const b = document.createElement("button");
-          b.className = `min-h-16 h-16 rounded-full px-4 text-sm leading-tight text-left overflow-hidden transition shadow-[0_4px_12px_rgba(95,86,78,0.08)] ${isSel ? "bg-[#fff4eb] ring-2 ring-[#f97316] text-[#8b4a18]" : "bg-[var(--surface-muted)] text-[var(--text-main)] hover:bg-[#ebe7de]"}`;
+          b.className = `w-full h-12 rounded-full px-3 text-sm leading-tight text-center whitespace-nowrap text-ellipsis overflow-hidden transition shadow-[0_4px_12px_rgba(95,86,78,0.08)] ${isSel ? "bg-[#fff5ef] border-2 border-[var(--accent)] text-[#8b4a18]" : "bg-[var(--surface-muted)] border-2 border-transparent text-[var(--text-main)] hover:bg-[#ebe7de]"}`;
           b.textContent = block.label;
           b.onclick = () => {
             const s = getSelectedSet(sc.id);
