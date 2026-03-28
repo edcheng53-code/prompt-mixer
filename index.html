@@ -4,78 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Prompt Mixer</title>
-  <meta name="theme-color" content="#121212" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23121212'/%3E%3Ctext x='96' y='108' font-size='84' text-anchor='middle' fill='%233b82f6'%3E🎛%3C/text%3E%3C/svg%3E">
+  <meta name="theme-color" content="#f6f3ea" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23f6f3ea'/%3E%3Ctext x='96' y='108' font-size='84' text-anchor='middle' fill='%23f97316'%3E🎛%3C/text%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    :root { color-scheme: dark; }
-    body { background: #121212; }
+    :root {
+      color-scheme: light;
+      --bg: #f6f3ea;
+      --surface: #fbf8f1;
+      --surface-muted: #f0ede5;
+      --text-main: #403b36;
+      --text-soft: #6f675f;
+      --accent: #f97316;
+      --shadow-soft: 0 8px 26px rgba(99, 88, 77, 0.08);
+      --shadow-tiny: 0 3px 10px rgba(99, 88, 77, 0.06);
+    }
+
+    body { background: var(--bg); }
     .snap-x-mandatory { scroll-snap-type: x mandatory; }
     .snap-start { scroll-snap-align: start; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
     .safe-pt { padding-top: env(safe-area-inset-top); }
+
+    .soft-card {
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .soft-pill {
+      border-radius: 9999px;
+      box-shadow: var(--shadow-tiny);
+    }
   </style>
 </head>
-<body class="text-gray-100 min-h-screen overflow-hidden">
+<body class="min-h-screen overflow-hidden text-[var(--text-main)] antialiased">
   <div class="h-screen flex flex-col">
-    <header class="safe-pt px-3 pt-2 pb-2 border-b border-gray-800 bg-[#121212]/95 backdrop-blur z-20">
-      <div class="flex items-center gap-2">
-        <div id="scenarioTabs" class="flex-1 overflow-x-auto hide-scrollbar">
-          <div class="flex gap-2 min-w-max"></div>
+    <header class="safe-pt px-5 pt-4 pb-4 z-20">
+      <div class="soft-card rounded-[2rem] px-4 py-4">
+        <div class="flex items-center gap-3">
+          <div id="scenarioTabs" class="flex-1 overflow-x-auto hide-scrollbar">
+            <div class="flex gap-3 min-w-max"></div>
+          </div>
+          <button id="addScenarioBtn" class="h-12 min-w-12 px-4 rounded-full bg-[#f97316] hover:bg-[#ea650b] text-white font-semibold transition active:scale-95 soft-pill">+
+          </button>
         </div>
-        <button id="addScenarioBtn" class="h-12 min-w-12 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-bold">+
-        </button>
       </div>
     </header>
 
-    <main class="flex-1 overflow-hidden">
-      <div id="carousel" class="h-full flex overflow-x-auto snap-x-mandatory hide-scrollbar"></div>
+    <main class="flex-1 overflow-hidden px-5 pb-4">
+      <div class="soft-card h-full rounded-[2rem] p-2 overflow-hidden">
+        <div id="carousel" class="h-full flex overflow-x-auto snap-x-mandatory hide-scrollbar"></div>
+      </div>
     </main>
 
-    <footer class="safe-pb border-t border-gray-800 bg-[#151515] px-3 pt-2 pb-3 shrink-0">
-      <div class="mb-2">
-        <label class="text-xs text-gray-400 mb-1 block">語音 / 文字輸入</label>
-        <textarea id="inputText" rows="2" placeholder="輸入你要追加的內容..."
-          class="w-full resize-none overflow-hidden rounded-xl bg-gray-900 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-      </div>
+    <footer class="safe-pb px-5 pb-5 pt-1 shrink-0">
+      <div class="soft-card rounded-[2rem] px-4 py-4 max-w-5xl mx-auto">
+        <div class="mb-3 max-w-4xl mx-auto">
+          <label class="text-xs text-[var(--text-soft)] mb-2 block">語音 / 文字輸入</label>
+          <textarea id="inputText" rows="2" placeholder="輸入你要追加的內容..."
+            class="w-full resize-none overflow-hidden rounded-full bg-[var(--surface-muted)] px-5 py-3 text-sm text-[var(--text-main)] placeholder:text-[#9a9188] focus:outline-none focus:ring-2 focus:ring-[#f97316]/45"></textarea>
+        </div>
 
-      <div class="flex items-center gap-2">
-        <button id="composeBtn"
-          class="h-16 basis-4/5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] transition font-semibold flex items-center justify-center gap-2">
-          <span>🚀 組合並複製</span>
-        </button>
-        <button id="clearBtn"
-          class="h-16 basis-1/5 rounded-xl bg-gray-700 hover:bg-gray-600 active:scale-[0.98] transition font-semibold">
-          🧹 清空
-        </button>
+        <div class="max-w-4xl mx-auto flex items-center gap-3">
+          <button id="composeBtn"
+            class="h-14 px-7 rounded-full bg-[#f97316] hover:bg-[#ea650b] text-white transition font-semibold flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(249,115,22,0.28)]">
+            <span>🚀 組合並複製</span>
+          </button>
+          <button id="clearBtn"
+            class="h-14 px-6 rounded-full bg-[var(--surface-muted)] hover:bg-[#ebe7de] transition font-semibold text-[var(--text-main)] soft-pill">
+            🧹 清空
+          </button>
 
-        <div class="relative">
-          <button id="menuBtn" class="h-16 w-14 rounded-xl bg-gray-800 hover:bg-gray-700 flex items-center justify-center">💾</button>
-          <div id="menuPanel" class="hidden absolute right-0 bottom-20 w-44 rounded-xl border border-gray-700 bg-gray-900 shadow-xl overflow-hidden">
-            <button id="exportBtn" class="w-full text-left px-3 py-3 hover:bg-gray-800 text-sm">匯出 JSON</button>
-            <button id="importBtn" class="w-full text-left px-3 py-3 hover:bg-gray-800 text-sm">匯入 JSON</button>
-            <input id="importFile" type="file" accept="application/json" class="hidden" />
+          <div class="relative ml-auto">
+            <button id="menuBtn" class="h-14 px-6 rounded-full bg-[var(--surface-muted)] hover:bg-[#ebe7de] flex items-center justify-center soft-pill">💾</button>
+            <div id="menuPanel" class="hidden absolute right-0 bottom-20 w-48 rounded-[1.5rem] bg-[var(--surface)] shadow-[0_14px_28px_rgba(87,74,61,0.12)] overflow-hidden p-1">
+              <button id="exportBtn" class="w-full text-left px-4 py-3 hover:bg-[var(--surface-muted)] text-sm rounded-full">匯出 JSON</button>
+              <button id="importBtn" class="w-full text-left px-4 py-3 hover:bg-[var(--surface-muted)] text-sm rounded-full">匯入 JSON</button>
+              <input id="importFile" type="file" accept="application/json" class="hidden" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <p id="status" class="text-xs text-gray-400 mt-2 h-4"></p>
+        <p id="status" class="text-xs text-[var(--text-soft)] mt-3 h-4 text-center"></p>
+      </div>
     </footer>
   </div>
 
-  <div id="modal" class="hidden fixed inset-0 z-50 bg-black/60 p-4">
-    <div class="max-w-xl mx-auto mt-10 rounded-2xl border border-gray-700 bg-gray-900 p-4">
-      <h3 class="text-lg font-semibold mb-3">編輯積木</h3>
-      <label class="text-sm text-gray-300">標題 Label</label>
-      <input id="modalLabel" class="mt-1 mb-3 w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2" />
-      <label class="text-sm text-gray-300">指令 Content</label>
-      <textarea id="modalContent" rows="6" class="mt-1 w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2"></textarea>
-      <div class="flex justify-end gap-2 mt-4">
-        <button id="modalCancel" class="h-11 px-4 rounded-lg bg-gray-700">取消</button>
-        <button id="modalSave" class="h-11 px-4 rounded-lg bg-blue-600">儲存</button>
+  <div id="modal" class="hidden fixed inset-0 z-50 bg-[#403b36]/30 backdrop-blur-sm p-5">
+    <div class="max-w-xl mx-auto mt-10 rounded-[2rem] bg-[var(--surface)] p-6 shadow-[0_18px_38px_rgba(77,65,53,0.14)]">
+      <h3 class="text-lg font-semibold mb-4">編輯積木</h3>
+      <label class="text-sm text-[var(--text-soft)]">標題 Label</label>
+      <input id="modalLabel" class="mt-2 mb-4 w-full rounded-full bg-[var(--surface-muted)] px-4 py-3" />
+      <label class="text-sm text-[var(--text-soft)]">指令 Content</label>
+      <textarea id="modalContent" rows="6" class="mt-2 w-full rounded-[1.25rem] bg-[var(--surface-muted)] px-4 py-3"></textarea>
+      <div class="flex justify-end gap-3 mt-5">
+        <button id="modalCancel" class="h-11 px-5 rounded-full bg-[var(--surface-muted)]">取消</button>
+        <button id="modalSave" class="h-11 px-5 rounded-full bg-[#f97316] text-white">儲存</button>
       </div>
     </div>
   </div>
@@ -142,7 +169,7 @@
       mixerData.scenarios.forEach(sc => {
         const active = sc.id === mixerData.activeScenarioId;
         const btn = document.createElement("button");
-        btn.className = `h-12 px-4 rounded-xl border text-sm whitespace-nowrap ${active ? "bg-blue-900/40 border-blue-500 text-blue-200" : "bg-gray-900 border-gray-700 text-gray-200"}`;
+        btn.className = `h-12 px-5 rounded-full text-sm whitespace-nowrap transition ${active ? "bg-[#fff2e8] text-[#a34b00] ring-2 ring-[#f97316] shadow-[0_6px_16px_rgba(249,115,22,0.18)]" : "bg-[var(--surface-muted)] text-[var(--text-main)] hover:bg-[#ebe7de] soft-pill"}`;
         btn.textContent = sc.name;
         btn.onclick = () => { mixerData.activeScenarioId = sc.id; saveData(); renderAll(); };
         attachLongPress(btn, () => {
@@ -172,13 +199,13 @@
       carousel.innerHTML = "";
       sc.panels.forEach((panel, pIdx) => {
         const section = document.createElement("section");
-        section.className = "snap-start min-w-full h-full p-3 flex flex-col";
+        section.className = "snap-start min-w-full h-full p-5 flex flex-col";
         section.innerHTML = `
-          <div class="mb-2 flex items-center justify-between">
-            <h2 class="text-lg font-semibold">${panel.title}</h2>
-            <button class="add-block h-10 px-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm">+ 新增積木</button>
+          <div class="mb-5 flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-[var(--text-main)]">${panel.title}</h2>
+            <button class="add-block h-11 px-5 rounded-full bg-[var(--surface-muted)] hover:bg-[#e9e4da] text-sm soft-pill">+ 新增積木</button>
           </div>
-          <div class="grid grid-cols-3 gap-2 overflow-y-auto pb-2 flex-1"></div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto pb-3 flex-1"></div>
         `;
 
         section.querySelector(".add-block").onclick = () => {
@@ -192,7 +219,7 @@
         panel.blocks.forEach(block => {
           const isSel = selected.has(block.id);
           const b = document.createElement("button");
-          b.className = `min-h-16 h-16 rounded-xl border px-2 text-sm leading-tight text-left overflow-hidden ${isSel ? "border-2 border-blue-500 bg-blue-900/30" : "border-gray-700 bg-gray-900"}`;
+          b.className = `min-h-16 h-16 rounded-full px-4 text-sm leading-tight text-left overflow-hidden transition shadow-[0_4px_12px_rgba(95,86,78,0.08)] ${isSel ? "bg-[#fff4eb] ring-2 ring-[#f97316] text-[#8b4a18]" : "bg-[var(--surface-muted)] text-[var(--text-main)] hover:bg-[#ebe7de]"}`;
           b.textContent = block.label;
           b.onclick = () => {
             const s = getSelectedSet(sc.id);
@@ -297,11 +324,11 @@
         name: "Prompt Mixer",
         short_name: "Mixer",
         display: "standalone",
-        background_color: "#121212",
-        theme_color: "#121212",
+        background_color: "#f6f3ea",
+        theme_color: "#f6f3ea",
         start_url: ".",
         icons: [{
-          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23121212'/%3E%3Ctext x='96' y='108' font-size='84' text-anchor='middle' fill='%233b82f6'%3E🎛%3C/text%3E%3C/svg%3E",
+          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23f6f3ea'/%3E%3Ctext x='96' y='108' font-size='84' text-anchor='middle' fill='%23f97316'%3E🎛%3C/text%3E%3C/svg%3E",
           sizes: "192x192",
           type: "image/svg+xml"
         }]
