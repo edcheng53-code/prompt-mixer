@@ -74,8 +74,8 @@
 </head>
 <body class="min-h-screen overflow-hidden text-[var(--text-main)] antialiased">
   <div class="h-screen flex flex-col">
-    <header class="safe-pt px-3 pt-2 pb-1 z-20">
-      <div class="ui-card px-2 py-2">
+    <header id="appHeader" class="fixed inset-x-0 top-0 h-16 z-[9999] px-3 py-2 bg-[var(--bg)]">
+      <div class="ui-card h-full px-2 py-1.5">
         <div class="flex items-center gap-2">
           <div id="scenarioTabs" class="flex-1 overflow-x-auto hide-scrollbar">
             <div class="flex gap-2 min-w-max"></div>
@@ -85,7 +85,7 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-hidden px-3 pb-1">
+    <main class="flex-1 overflow-hidden px-3 pt-[4.05rem] pb-1">
       <div class="ui-card h-full overflow-hidden p-1.5">
         <div id="carousel" class="h-full flex overflow-x-auto snap-x-mandatory hide-scrollbar"></div>
       </div>
@@ -94,9 +94,9 @@
     <footer class="safe-pb px-3 pb-2 pt-1 shrink-0">
       <div class="ui-card footer-fixed px-2 py-2 max-w-6xl mx-auto flex flex-col">
         <textarea id="inputText" rows="2" placeholder="輸入你要追加的內容..."
-          class="w-full resize-none overflow-hidden bg-[var(--surface-muted)] text-sm text-[var(--text-main)] placeholder:text-[#9a9188] focus:outline-none focus:ring-2 focus:ring-[#f97316]/45"></textarea>
+          class="w-full resize-none overflow-hidden rounded-lg bg-[var(--surface-muted)] px-3 py-3 text-sm text-[var(--text-main)] placeholder:text-[#9a9188] focus:outline-none focus:ring-2 focus:ring-[#f97316]/45"></textarea>
 
-        <div class="grid grid-cols-3 gap-2 mt-2">
+        <div class="grid grid-cols-3 items-stretch gap-2 mt-2">
           <button id="composeBtn"
             class="h-12 px-4 bg-[#f97316] hover:bg-[#ea650b] text-white transition font-semibold flex items-center justify-center gap-2">
             <span>🚀 組合並複製</span>
@@ -106,8 +106,8 @@
             🧹 清空
           </button>
 
-          <div class="relative">
-            <button id="menuBtn" class="h-12 w-full px-4 bg-[var(--surface-muted)] hover:bg-[#efe9e1] transition font-semibold text-[var(--text-main)] flex items-center justify-center gap-2">
+          <div class="relative h-12">
+            <button id="menuBtn" class="h-full w-full px-4 bg-[var(--surface-muted)] hover:bg-[#efe9e1] transition font-semibold text-[var(--text-main)] flex items-center justify-center gap-2">
               <i data-lucide="archive" class="w-4 h-4"></i>
               <span>存檔資料</span>
             </button>
@@ -232,7 +232,7 @@
         const section = document.createElement("section");
         section.className = "snap-start min-w-full h-full p-1 flex flex-col";
         section.innerHTML = `
-          <div class="my-2 flex items-center justify-between">
+          <div class="my-1 flex items-center justify-between">
             <h2 class="text-sm font-semibold text-[var(--text-main)] leading-none">${panel.title}</h2>
             <button class="add-block h-8 px-2.5 border border-[#ebddcb] bg-[var(--surface-muted)] hover:bg-[#efe9e1] text-xs">+ 新增積木</button>
           </div>
@@ -350,6 +350,27 @@
       el.style.height = Math.min(el.scrollHeight, 94) + "px";
     }
 
+    function forceHeaderTopLock(){
+      const header = document.getElementById("appHeader");
+      if (!header) return;
+      header.style.top = "0px";
+      header.style.transform = "translateY(0)";
+      header.getBoundingClientRect();
+    }
+
+    function syncViewportAfterInputBlur(){
+      window.scrollTo(0, 0);
+      forceHeaderTopLock();
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        forceHeaderTopLock();
+      });
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        forceHeaderTopLock();
+      }, 120);
+    }
+
     function setupPWA(){
       const manifest = {
         name: "Prompt Mixer",
@@ -397,6 +418,18 @@
       saveData();
     });
 
+    document.addEventListener("blur", (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        syncViewportAfterInputBlur();
+      }
+    }, true);
+
+    window.addEventListener("resize", forceHeaderTopLock);
+    window.addEventListener("orientationchange", () => {
+      window.scrollTo(0, 0);
+      forceHeaderTopLock();
+    });
+
     document.getElementById("composeBtn").onclick = async () => {
       const text = composePrompt();
       try { await navigator.clipboard.writeText(text); showStatus("已組合並複製到剪貼簿"); }
@@ -433,6 +466,7 @@
     };
 
     setupPWA();
+    forceHeaderTopLock();
     renderAll();
   </script>
 </body>
